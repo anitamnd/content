@@ -41,13 +41,10 @@ jobs:
           git push origin HEAD:${{ github.head_ref }}
           echo "✅ Reformatted JSON and pushed changes"
 
-      - name: Merge PR (server-side)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git fetch origin master
-          gh pr merge ${{ github.event.pull_request.number }} --squash --delete-branch
-          echo "✅ Merged PR #${{ github.event.pull_request.number }} into master"
+      - name: Enable auto-merge if valid
+        if: success() && !endsWith(github.head_ref, '__delete')  # Only after validation passes
+        run: gh pr merge ${{ github.event.pull_request.number }} --auto --squash
 
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
- 
